@@ -127,7 +127,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }));
 
 
-    
+
 
 
     modal.addEventListener('click', (e) => {
@@ -241,7 +241,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // Forms
 
     const forms = document.querySelectorAll('form');
-    console.log(forms);
 
     const message = {
         loading: 'img/form/spinner.svg',
@@ -259,44 +258,50 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const statusMessage = document.createElement('img');
             statusMessage.src = message.loading;
-            statusMessage.style.cssText =`
+            statusMessage.style.cssText = `
             display: block;
             margin: 0 auto;
             `;
             // form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+            // const request = new XMLHttpRequest();
+            // request.open('POST', 'server.php');
 
-            request.setRequestHeader('Content-type', 'application/json');//'multipart/form-data'
+            // request.setRequestHeader('Content-type', 'application/json');//'multipart/form-data'
+
 
 
             const formData = new FormData(form);
 
             const object = {};
-            formData.forEach((value, key)=>{
+            formData.forEach((value, key) => {
                 object[key] = value;
             });
-            const json = JSON.stringify(object);
 
-            request.send(json);//formData
-
-            
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log((request.response));
+            fetch('server.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(object)
+                })
+                .then(data => data.text())
+                .then(data => {
+                    console.log((data));
                     showThanksModal(message.success);
-                    form.reset();
-                        statusMessage.remove();
-                } else {
+
+                    statusMessage.remove();
+                }).catch(() => {
                     showThanksModal(message.failure);
-                }
-            });
+                }).finally(() => {
+                    form.reset();
+                });
+
         });
     }
 
-    function showThanksModal(message){
+    function showThanksModal(message) {
         const prevModalDialog = document.querySelector('.modal__dialog');
 
         prevModalDialog.classList.add('hide');
@@ -313,7 +318,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('.modal').append(thanksModal);
 
-        setTimeout(()=>{
+        setTimeout(() => {
             thanksModal.remove();
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
@@ -321,4 +326,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
 
     }
+
+
 });
